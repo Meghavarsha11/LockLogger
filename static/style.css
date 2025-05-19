@@ -1,0 +1,111 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #fcefee;
+  color: #333;
+  text-align: center;
+  padding: 2rem;
+}
+
+h1 {
+  margin-bottom: 1rem;
+}
+
+button {
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  background-color: #040102;
+  border: none;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background-color: #736767;
+}
+
+.log {
+  margin-top: 2rem;
+  font-size: 1rem;
+}
+
+.timestamp {
+  margin-top: 0.5rem;
+  font-weight: bold;
+}
+.message {
+  margin-top: 1rem;
+  font-style: italic;
+  color: #db2720;
+}
+
+.ago {
+  margin-top: 0.5rem;
+  color: #777;
+}
+
+.history {
+  margin-top: 2rem;
+}
+
+.history ul {
+  list-style: none;
+  padding: 0;
+}
+
+.history li {
+  background: #fff;
+  border: 1px solid #ddd;
+  margin: 0.3rem auto;
+  max-width: 300px;
+  padding: 0.5rem;
+  border-radius: 8px;
+}
+.message {
+  margin-top: 1rem;
+  font-style: italic;
+  color: #d10c0c;
+}
+
+.ago {
+  margin-top: 0.5rem;
+  color: #777;
+}
+
+.history {
+  margin-top: 2rem;
+}
+
+.history ul {
+  list-style: none;
+  padding: 0;
+}
+
+.history li {
+  background: #fff;
+  border: 1px solid #ddd;
+  margin: 0.3rem auto;
+  max-width: 300px;
+  padding: 0.5rem;
+  border-radius: 8px;
+}
+.manual-entry {
+  margin-top: 2rem;
+}
+
+.manual-entry input {
+  padding: 0.5rem;
+  font-size: 1rem;
+  margin-right: 0.5rem;
+}
+
+.manual-entry button {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+}
+
+#manualMsg {
+  margin-top: 0.5rem;
+  color: #2196f3;
+}

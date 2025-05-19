@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Did I Lock the Door?</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+  <meta name="theme-color" content="#007bff" />
+
+</head>
+<body>
+  <h1>Did I Lock the Door?</h1>
+  <button onclick="logLock()">Yes, I did!</button>
+  <button onclick="undoLast()">Undo Last Lock</button>
+  <div class="manual-entry">
+  <h3>Manual Lock Entry</h3>
+  <input type="datetime-local" id="manualTime">
+  <button onclick="submitManual()">Add Entry</button>
+  <div id="manualMsg"></div>
+</div>
+<div class="log">
+    <p>Last locked:</p>
+    <div class="timestamp" id="lastLock">
+      {{ "No record yet" }}
+    </div>
+    <div class="message" id="motivation"></div>
+  </div>
+<div class="history">
+    <h2>Lock History</h2>
+    <ul id="historyList">
+      {% for item in history %}
+        <li>{{ item }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+<script>
+    function logLock() {
+      fetch('/log', { method: 'POST' })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            document.getElementById('lastLock').textContent = data.timestamp;
+            document.getElementById('motivation').textContent = data.message;
+            addToHistory(data.timestamp);
+            updateTimeAgo(data.timestamp);
+          }
+        });
+    }
+    function addToHistory(entry) {
+      const list = document.getElementById('historyList');
+      const li = document.createElement('li');
+      li.textContent = entry;
+      list.prepend(li);
+    }
+
+    function updateTimeAgo(timestamp) {
+      const now = new Date();
+      const last = new Date(timestamp);
+      const diffMs = now - last;
+      const diffMins = Math.floor(diffMs / 60000);
+      let msg = '';
+
+      if (diffMins < 1) msg = "Just now.";
+      else if (diffMins < 60) msg = `Locked ${diffMins} minutes ago.`;
+      else msg = `Locked ${Math.floor(diffMins / 60)} hours ago.`;
+
+      document.getElementById('agoMsg').textContent = msg;
+    }
+function undoLast() {
+  fetch('/undo', { method: 'POST' })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        const historyList = document.getElementById('historyList');
+        if (historyList.firstChild) historyList.removeChild(historyList.firstChild);
+        const newLast = historyList.firstChild ? historyList.firstChild.textContent : "No record yet";
+        document.getElementById('lastLock').textContent = newLast;
+        document.getElementById('agoMsg').textContent = '';
+        document.getElementById('motivation').textContent = `Removed last entry: ${data.removed}`;
+      } else {
+        alert(data.message);
+      }
+    });
+}
+
+function submitManual() {
+  const input = document.getElementById('manualTime').value;
+  if (!input) return;
+  const timestamp = input.replace('T', ' ') + ":00";
+
+  fetch('/manual', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ timestamp })
+  })
+    .then(res => res.json())
+    .then(data => {
+      const msgBox = document.getElementById('manualMsg');
+      if (data.success) {
+        msgBox.textContent = "Added: " + data.timestamp;
+        addToHistory(data.timestamp);
+        document.getElementById('lastLock').textContent = data.timestamp;
+        updateTimeAgo(data.timestamp);
+      } else {
+        msgBox.textContent = "Error: " + data.message;
+      }
+    });
+}
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/static/service-worker.js')
+        .then(() => console.log('Service Worker Registered'))
+        .catch(err => console.log('Service Worker registration failed:', err));
+    });
+  }
+
+    window.onload = () => {
+      const lastText = document.getElementById('lastLock').textContent;
+      if (lastText && lastText !== "No record yet") {
+        updateTimeAgo(lastText);
+      }
+    };
+  </script>
+</body>
+</html>
